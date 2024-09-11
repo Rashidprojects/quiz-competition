@@ -1,7 +1,10 @@
+import hero from '../assets/hero-baner.png'
 
 const Hero = () => {
   return (
-    <div>Hero</div>
+    <div>
+      <img src={hero} alt="" />
+    </div>
   )
 }
 
