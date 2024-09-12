@@ -1,10 +1,11 @@
 // src/RegisterPage.jsx
 
 import React, { useEffect, useState } from 'react';
-import { signInWithEmailAndPassword } from 'firebase/auth';
+import { signInWithEmailAndPassword, signInWithPopup } from 'firebase/auth';
 import { FaFacebookF,FaGoogle,FaGithub } from "react-icons/fa";
-import { auth } from '../../firebase';
+import { auth, db, googleProvider, githubProvider } from '../../firebase';
 import { useNavigate } from 'react-router-dom';
+import { doc, setDoc } from 'firebase/firestore';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -25,7 +26,40 @@ const Login = () => {
         } catch(error){
             alert(error.message)
         }
+  }
+
+  const handleGoogleSignin = async () => {
+    try {
+      const result = await signInWithPopup(auth,googleProvider);
+      const user = result.user;
+
+      await setDoc(doc(db, 'users', user.uid), {
+        username : user.displayName || '',
+        email: user.email || '',
+        bgColor: ''
+      })
+
+      navigate('/')
+    } catch (error) {
+      alert(error.message)
     }
+  }
+
+  const handleGithubSignin = async () => {
+    try {
+      const result = await signInWithPopup(auth,githubProvider);
+      const user = result.user;
+
+      await setDoc(doc(db, 'users', user.uid), {
+        username: user.displayName || '',
+        email: user.email || '',
+        bgColor: ''
+      })
+      navigate('/')
+    } catch (error) {
+      alert(error.message)
+    }
+  }
 
   const handleSignup = () => {
     navigate('/auth/register/')
@@ -45,11 +79,13 @@ const Login = () => {
         style={{ boxShadow: '0 -4px 6px rgba(255, 255, 255, 0.5), 0 4px 6px rgba(0, 0, 0, 0.5)' }}
         ><FaFacebookF /></li>
 
-        <li className='rounded-full px-3 py-3 bg-gray-100 cursor-pointer shadow-lg hover:scale-125 hover:transition ease-in-out duration-300'
+        <li onClick={handleGoogleSignin}
+        className='rounded-full px-3 py-3 bg-gray-100 cursor-pointer shadow-lg hover:scale-125 hover:transition ease-in-out duration-300'
         style={{ boxShadow: '0 -4px 6px rgba(255, 255, 255, 0.5), 0 4px 6px rgba(0, 0, 0, 0.5)' }}
         ><FaGoogle /></li>
 
-        <li className='rounded-full px-3 py-3 bg-gray-100 cursor-pointer shadow-lg hover:scale-125 hover:transition ease-in-out duration-300'
+        <li  onClick={handleGithubSignin}
+        className='rounded-full px-3 py-3 bg-gray-100 cursor-pointer shadow-lg hover:scale-125 hover:transition ease-in-out duration-300'
         style={{ boxShadow: '0 -4px 6px rgba(255, 255, 255, 0.5), 0 4px 6px rgba(0, 0, 0, 0.5)' }}
         ><FaGithub /></li>
     </div>
