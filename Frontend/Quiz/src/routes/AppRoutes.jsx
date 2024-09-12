@@ -21,7 +21,6 @@ const AppRoutes = () => {
             <Route path='about/' element={<AboutPage />} />
             <Route path='contact/' element={<ContactPage />} />
 
-
             {/* Nested Auth and Admin Routes */}
             <Route path="/auth/*" element={<AuthRoutes />} />
             <Route path="/admin/*" element={<AdminRoutes />} />
