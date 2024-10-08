@@ -4,7 +4,7 @@ import AuthRoutes from './AuthRoutes'
 import AdminRoutes from './AdminRoutes'
 
 // Lazy load the Home and About components
-const Home = React.lazy(() => import('../pages/home') )
+const Home = React.lazy(() => import('../pages/Home') )
 const AboutPage = React.lazy(() => import('../pages/AboutPage') )
 const Rules = React.lazy(() => import('../pages/Rules') )
 const Result = React.lazy(() => import('../pages/Result') )
