@@ -67,6 +67,8 @@ const Navbar = () => {
     return () => unsubscribe();
   },[])
 
+  console.log('current user is : ', user);
+  
   // Only log if userIcon has a value
   useEffect(() => {
     if (userIcon) {

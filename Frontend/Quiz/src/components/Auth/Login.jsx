@@ -122,7 +122,7 @@ const Login = () => {
 {/* Right Section */}
     
     <div className={` w-1/2 bg-blue-900 flex items-center justify-center flex-col gap-6 transform transition-transform duration-1000 ${animate ? 'translate-x-0' : '-translate-x-1/3'} `}> 
-      <h2 className='text-6xl font-bold text-center text-white'>Welcome To <br /> Quiz Mastery!</h2>
+      <h2 className='text-6xl font-bold text-center text-white'>Welcome To <br /> Quizera!</h2>
       <p className='text-gray-300 text-1xl font-medium cursor-pointer'>New Here?</p>
       <button onClick={handleSignup}
       className='bg-blue-900 text-white font-semibold rounded-2xl shadow-lg px-5 py-2 hover:shadow-xl transition-shadow hover:scale-110 hover:transition ease-in-out duration-300'

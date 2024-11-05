@@ -2,6 +2,7 @@ import React, { Suspense } from 'react'
 import { Routes,Route } from 'react-router-dom'
 import AuthRoutes from './AuthRoutes'
 import AdminRoutes from './AdminRoutes'
+import { UserProvider } from '../context/UserContext'
 
 // Lazy load the Home and About components
 const Home = React.lazy(() => import('../pages/Home') )
@@ -14,6 +15,7 @@ const AppRoutes = () => {
   return (
     
     <Suspense fallback={ <div>Loading</div> } >
+      <UserProvider>
         <Routes>
             <Route path='/' element={<Home/>} />
             <Route path='rules/' element={<Rules/>} />
@@ -27,6 +29,7 @@ const AppRoutes = () => {
             
             {/* <Route path="*" element={<NotFound />} /> */}
         </Routes>
+      </UserProvider>
     </Suspense>
     
   )
