@@ -31,7 +31,7 @@ export const verifyOtp = async (otp, email) => {
         const csrfToken = csrfResponse.data.csrfToken;
 
         const response = await axios.post('http://127.0.0.1:8000/api/verify-otp/', {
-            otp: otp,
+            otp_code: otp,
             email: email
         }, {
             headers : {
@@ -41,6 +41,7 @@ export const verifyOtp = async (otp, email) => {
         });
 
         return response.data;
+        
     } catch (error) {
         console.error('Error verifying OTP:', error);
         throw new Error('OTP verification failed');

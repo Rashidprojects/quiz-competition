@@ -1,68 +1,82 @@
-import React, { useRef } from 'react';
-import { verifyOtp } from '../../services/otpService';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+import React, { useState, useContext, useRef } from 'react';
+import { UserContext } from '../../context/UserContext';
 
-const OtpInput = ({ email,onOtpVerified }) => {
-    const inputs = useRef([]);
+const OtpInput = () => {
+    const [otp, setOtp] = useState(['', '', '', '', '', '']);
+    const { state } = useContext(UserContext);
+    const inputRefs = useRef([]);
+    const navigate = useNavigate()
 
-    const handleChange = (e, index) => {
-        const value = e.target.value; 
+    const handleChange = (index, value) => {
+        // Ensure the value is a single digit or empty
+        if (value.length > 1) return;
+        
+        const newOtp = [...otp];
+        newOtp[index] = value;
 
-        if (value.length > 1 || (value && isNaN(value))) {
-            e.target.value = '';
-            return
-        }
+        setOtp(newOtp);
 
-        // Move to the next input if the current one has a value
-        if (e.target.value.length === 1 && index < inputs.current.length - 1) {
-            inputs.current[index + 1].focus();
-        }
-
-        // Handle backspace to move to the previous input
-        if (e.target.value.length === 0 && index > 0 && e.nativeEvent.inputType === 'deleteContentBackward') {
-            inputs.current[index - 1].focus();
+        // Move to the next input if the current input is filled
+        if (value && index < otp.length - 1) {
+            inputRefs.current[index + 1].focus();
         }
     };
 
-    const handleSubmit = async () => {
-        const otp = inputs.current.map(input => input.value).join('');
+    const handleKeyDown = (index, e) => {
+        // Move to the previous input on backspace
+        if (e.key === 'Backspace' && !otp[index] && index > 0) {
+            inputRefs.current[index - 1].focus();
+        }
+    };
+
+    const handleOtpVerification = async (e) => {
+        e.preventDefault();
+        const otpString = otp.join(''); // Join the OTP array into a single string
+
         try {
-            const response = await verifyOtp(otp, email);
-            if (response.success) {
-                alert('OTP verified successfully!');
-                onOtpVerified(); // Call the callback if OTP is verified
-            } else {
-                alert('Invalid OTP. Please try again.');
-            }
+            const response = await axios.post('http://localhost:8000/api/verify-otp/', {
+                username: state.username,
+                otp: otpString,
+            });
+            navigate('/')
+            console.log('Successfully verified OTP');
         } catch (error) {
-            alert('An error occurred during OTP verification. Please try again.');
+            console.error('Error verifying OTP:', error.response ? error.response.data : error.message);
+            alert('Failed to verify OTP: ' + (error.response?.data?.error || 'Unknown error'));
         }
     };
 
     return (
-        <div>
-            <h2>Enter OTP</h2>
-            <div id="otp-container">
-                {[...Array(6)].map((_, index) => (
+        <form onSubmit={handleOtpVerification} className="otp-input">
+            <h2>Username from: {state.username}</h2>
+            <div className="otp-input-container" style={{ display: 'flex', justifyContent: 'space-between', width: '240px' }}>
+                {otp.map((digit, index) => (
                     <input
                         key={index}
                         type="text"
                         maxLength="1"
-                        ref={el => (inputs.current[index] = el)}
-                        onChange={e => handleChange(e, index)}
+                        value={digit}
+                        onChange={(e) => handleChange(index, e.target.value)}
+                        onKeyDown={(e) => handleKeyDown(index, e)}
+                        ref={(el) => (inputRefs.current[index] = el)}
+                        placeholder=""
                         style={{
-                            width: '40px',
+                            width: '30px',
                             height: '40px',
                             fontSize: '20px',
                             textAlign: 'center',
-                            margin: '0 5px',
+                            margin: '10px 5px',
                             border: '1px solid #ccc',
                             borderRadius: '5px',
                         }}
+                        className="otp-input-field"
                     />
                 ))}
             </div>
-            <button onClick={handleSubmit}>Submit OTP</button>
-        </div>
+            <button type="submit">Verify OTP</button>
+        </form>
     );
 };
 
