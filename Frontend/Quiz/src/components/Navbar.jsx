@@ -1,80 +1,50 @@
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import logo from '../assets/final_logo.png'
 import { Link } from 'react-router-dom';
-import { auth, db } from '../firebase';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
+import { UserContext } from '../context/UserContext';
+import axios from 'axios';
 
 
 
 const Navbar = () => {
-  const [user,setUser] = useState(null)
-  const [username,setUsername] = useState('')
+  const [userData,setUserData] = useState(null)
+  const [error, setError] = useState(null)
   const [settings,setSettings] = useState(false)  
-  const [userIcon, setUserIcon] = useState(null)
   const [bgColor, setBgColor] = useState('')
+  const { state,dispatch } = useContext(UserContext)
   const navigation = useNavigate()
   
   console.log("current bg is : ", bgColor);
   
 
+  useEffect(() => {
+    const username = state?.username
+    const fetchUserData = async () => {
+      try {
+        const response = await axios.get(`http://127.0.0.1:8000/api/user/${username}/`);
+        setUserData(response.data)
+
+      } catch(err) {
+        setError("Error fetching user data");
+          console.error("Error fetching user data:", err);
+      }
+    };
+
+    fetchUserData()
+  }, [])
+
   const handleSettings = () => {
     setSettings(!settings)
   }
 
+
  
   const handleSignout = () => {
-    auth.signOut()
+    dispatch({ type: 'SET_USERNAME', payload: '' })
     setSettings(false)
   }
 
-  // Function to generate a random hex color
-  const getRandomColor = () => {
-    const letters = '0123456789ABCDEF';
-    let color = '#';
-    for (let i = 0; i < 6; i++) {
-      color += letters[Math.floor(Math.random() * 16)];
-    }
-    return color;
-  };
-
-  useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged(async (user) => {
-      setUser(user)
-
-      if(user) {
-        // Fetch the username from firestore
-        const userDoc = await getDoc(doc(db, 'users', user.uid));
-        if (userDoc.exists()) {
-          const userData = userDoc.data();
-          setUsername(userData.username) //set the username
-          // set user first letter as icon 
-          setUserIcon(userData.username.charAt(0).toUpperCase());
-
-          // set random background color for each user
-          if(!userData.bgColor) {
-            const randomColor = getRandomColor()
-            setBgColor(randomColor)
-
-            await setDoc(doc(db, 'users', user.uid), { bgColor: randomColor }, { merge:true } )
-          }else {
-            setBgColor(userData.bgColor)
-          }
-          
-        }
-      }
-    })
-    return () => unsubscribe();
-  },[])
-
-  console.log('current user is : ', user);
-  
-  // Only log if userIcon has a value
-  useEffect(() => {
-    if (userIcon) {
-      console.log("User first letter is:", userIcon);
-    }
-  }, [userIcon]); 
   
   return (
     <>
@@ -96,15 +66,15 @@ const Navbar = () => {
         </div>
 
         <div className="flex items-center gap-5">
-          {user ? (
+          {state.username ? (
             <>
-              <div>welcome, {username}</div>
+              <div>welcome, {userData?.username}</div>
 
               <div className='cursor-pointer z-10 text-1xl font-medium flex items-center justify-center rounded-full w-[35px] h-[35px] text-white'
-                style={{ backgroundColor: bgColor }}
+                style={{ backgroundColor: userData?.bg_color || '' }}
                 onClick={handleSettings}
                >
-               {userIcon}
+               {userData?.icon || ''}
               </div>
             </>
           ): (
