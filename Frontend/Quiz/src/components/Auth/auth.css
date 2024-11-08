@@ -15,3 +15,23 @@
 .customTextField .MuiInputLabel-root.Mui-focused{
     color: rgba(30, 58, 138, 1);
 }
+
+/* when input error  */
+.errorTextField .MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline{
+    border-color: rgb(230, 57, 70);
+    border-width: 2px;
+}
+
+.errorTextField .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline{
+    border-width: 2px;
+    border-color: rgb(230, 57, 70);
+}
+
+.errorTextField .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline{
+    border-color: rgb(230, 57, 70);
+}
+
+.errorTextField .MuiInputLabel-root.Mui-focused{
+    color: rgb(230, 57, 70);
+
+}
