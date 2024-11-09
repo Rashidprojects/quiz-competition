@@ -24,6 +24,7 @@ const Register = () => {
   const [userLoading, setUserLoading] = useState(false)
   const [usernameMessage, setUsernameMessage] = useState(null);
   const [usernameAvailable, setUsernameAvailable] = useState(true);
+  const [isEmail, setIsEmail] = useState(null)
   const navigate = useNavigate();
 
   console.log('message is :', usernameMessage + " user availablity : ", usernameAvailable );
@@ -95,8 +96,13 @@ const Register = () => {
     if (name === 'username') {
       checkUsername(value); // Call checkUsername on username field change
     }
+
+    if (name == 'email') {
+      value.includes('@gmail.com') ? setIsEmail(value) : setIsEmail(false) 
+    }
   };
 
+  
   const handleSignin = () => {
     navigate('/auth/login');
   };
