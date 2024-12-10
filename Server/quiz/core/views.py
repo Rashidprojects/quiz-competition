@@ -40,6 +40,14 @@ class UserMailView(RetrieveAPIView):
         email = self.kwargs['email']
         return get_object_or_404(User, email=email)
 
+class CheckUsernameView(APIView):
+    def get(self, request, username):
+        # Check if the username already exists in the database
+        if User.objects.filter(username=username).exists():
+            return Response({"available": False, "message": "This username is already taken."}, status=status.HTTP_200_OK)
+        else:
+            return Response({"available": True, "message": "This username is available."}, status=status.HTTP_200_OK)
+
 class UserRegistrationView(APIView):
     def post(self, request):
         serializer = UserRegistrationSerializer(data=request.data)
@@ -163,7 +171,7 @@ def google_login(request):
         except User.DoesNotExist:
             # Generate a new unique username and set icon and background
             user_id = str(uuid.uuid4().int)[:3]  # Generates a unique user ID part
-            username = f"{user_firstname}{user_id}"  # Example: rashid123456
+            username = f"{user_firstname}{user_id}"  # Example: rashid123
             bg_color = generate_random_color()  # Use your utility function
             icon = user_firstname[0].upper()
 
